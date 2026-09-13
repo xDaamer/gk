@@ -10,7 +10,8 @@ function isSameCalendarDay(a, b) {
 
 /**
  * Dashboard istatistiklerini hesaplar.
- * - activeOccupancy: şu an aktif (konaklamakta olan) misafir/oda sayısı
+ * - activeOccupancy: şu an dolu olan oda sayısı (paylaşımlı daireler tek sayılır)
+ * - activeGuests: konaklamakta olan toplam misafir sayısı
  * - monthlyRevenue: bu ay giriş yapan konaklamalardan tahsil edilmiş toplam tutar
  * - pendingRevenue: aktif konaklamalardan henüz tahsil edilmemiş tahmini gelir
  * - todaysCheckouts: bugün çıkışı planlanan aktif misafir sayısı
@@ -19,7 +20,9 @@ function isSameCalendarDay(a, b) {
 export function computeStats(db, now = new Date()) {
   const activeGuests = db.guests.filter((g) => g.status === 'active')
 
-  const activeOccupancy = activeGuests.length
+  // Daireler paylaşımlı olabildiği için doluluk, misafir değil ODA sayısıdır.
+  const occupiedRooms = new Set(activeGuests.map((g) => String(g.roomNumber)))
+  const activeOccupancy = occupiedRooms.size
 
   const allKnownGuests = [...db.guests, ...db.archive]
   const monthlyRevenue = allKnownGuests
@@ -50,6 +53,7 @@ export function computeStats(db, now = new Date()) {
 
   return {
     activeOccupancy,
+    activeGuests: activeGuests.length,
     totalRooms: ALL_ROOMS.length,
     dirtyRooms,
     monthlyRevenue: Math.round(monthlyRevenue * 100) / 100,

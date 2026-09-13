@@ -59,9 +59,10 @@ function RoomDetail({ room, busy, onSetHousekeeping }) {
   const state = roomState(room)
   const style = ROOM_STATE_STYLE[state]
   const isDirty = room.housekeeping === 'dirty'
+  const occupants = room.guests ?? (room.guest ? [room.guest] : [])
 
   return (
-    <div className="flex h-full flex-col rounded-xl border border-[var(--line)] bg-[var(--surface-card)] p-5">
+    <div className="flex h-full max-h-[640px] flex-col overflow-y-auto rounded-xl border border-[var(--line)] bg-[var(--surface-card)] p-5">
       <div className="flex items-center justify-between gap-3">
         <span className="font-mono text-2xl font-semibold text-[var(--ink)]">
           {room.roomNumber}
@@ -81,37 +82,46 @@ function RoomDetail({ room, busy, onSetHousekeeping }) {
         {floorLabel(room.floor)}
       </p>
 
-      {room.guest ? (
-        <dl className="mt-4 space-y-2 border-t border-[var(--line)] pt-4 text-sm">
-          <div>
-            <dt className="text-xs text-[var(--ink-muted)]">Misafir</dt>
-            <dd className="font-medium text-[var(--ink)]">{room.guest.fullName}</dd>
-          </div>
-          <div>
-            <dt className="text-xs text-[var(--ink-muted)]">Telefon</dt>
-            <dd className="font-mono text-[var(--ink)]">{room.guest.phone}</dd>
-          </div>
-          <div>
-            <dt className="text-xs text-[var(--ink-muted)]">Konaklama</dt>
-            <dd className="font-mono text-[var(--ink)]">
-              {formatDateShort(room.guest.checkInDate)} → {formatDateShort(room.guest.checkOutDate)}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-xs text-[var(--ink-muted)]">Kalan</dt>
-            <dd
-              className={`font-mono ${
-                room.guest.displayStatus === 'critical' ? 'text-red-600' : 'text-[var(--ink)]'
-              }`}
-            >
-              {room.guest.remainingDays < 0
-                ? 'Süresi geçti'
-                : room.guest.remainingDays === 0
-                  ? 'Bugün çıkış'
-                  : `${room.guest.remainingDays} gün`}
-            </dd>
-          </div>
-        </dl>
+      {occupants.length > 0 ? (
+        <div className="mt-4 space-y-4 border-t border-[var(--line)] pt-4">
+          {occupants.length > 1 && (
+            <p className="text-xs text-[var(--ink-muted)]">{occupants.length} misafir konaklıyor</p>
+          )}
+          {occupants.map((occupant) => (
+            <dl key={occupant.id} className="space-y-1.5 text-sm">
+              <div>
+                <dt className="text-xs text-[var(--ink-muted)]">Misafir</dt>
+                <dd className="font-medium text-[var(--ink)]">{occupant.fullName}</dd>
+              </div>
+              {occupant.phone && (
+                <div>
+                  <dt className="text-xs text-[var(--ink-muted)]">Telefon</dt>
+                  <dd className="font-mono text-[var(--ink)]">{occupant.phone}</dd>
+                </div>
+              )}
+              <div>
+                <dt className="text-xs text-[var(--ink-muted)]">Konaklama</dt>
+                <dd className="font-mono text-[var(--ink)]">
+                  {formatDateShort(occupant.checkInDate)} → {formatDateShort(occupant.checkOutDate)}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs text-[var(--ink-muted)]">Kalan</dt>
+                <dd
+                  className={`font-mono ${
+                    occupant.displayStatus === 'critical' ? 'text-red-600' : 'text-[var(--ink)]'
+                  }`}
+                >
+                  {occupant.remainingDays < 0
+                    ? 'Süresi geçti'
+                    : occupant.remainingDays === 0
+                      ? 'Bugün çıkış'
+                      : `${occupant.remainingDays} gün`}
+                </dd>
+              </div>
+            </dl>
+          ))}
+        </div>
       ) : (
         <p className="mt-4 border-t border-[var(--line)] pt-4 text-sm text-[var(--ink-muted)]">
           Oda boş.

@@ -111,6 +111,20 @@ function RoomTile({ box, room, selected, onSelect }) {
         {isFilled ? (room?.guest?.fullName ?? 'Dolu') : style.label}
       </text>
 
+      {/* Paylaşımlı daire: ilk misafirin yanında toplam kişi sayısı */}
+      {room?.occupantCount > 1 && (
+        <text
+          x={cx}
+          y={box.y + box.h / 2 + 48}
+          textAnchor="middle"
+          fill={style.subText}
+          fontSize="15"
+          className="select-none"
+        >
+          +{room.occupantCount - 1} kişi daha
+        </text>
+      )}
+
       {/* Dolu ama kirli oda: köşede uyarı noktası */}
       {isFilled && room?.housekeeping === 'dirty' && (
         <circle cx={box.x + box.w - 24} cy={box.y + 26} r="9" fill="var(--soil)" />

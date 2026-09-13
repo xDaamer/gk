@@ -270,32 +270,48 @@ app.post('/api/guests/:id/extend', async (req, res, next) => {
 
 // --- odalar & temizlik (kirli/temiz) ------------------------------------
 
+function toOccupantSummary(guest, now) {
+  return {
+    id: guest.id,
+    fullName: guest.fullName,
+    phone: guest.phone,
+    checkInDate: guest.checkInDate,
+    checkOutDate: guest.checkOutDate,
+    paymentStatus: guest.paymentStatus,
+    remainingDays: getRemainingDays(guest.checkOutDate, now),
+    displayStatus: deriveDisplayStatus(guest, now),
+  }
+}
+
+/**
+ * Bir oda birden fazla misafir barındırabilir (paylaşımlı daireler).
+ * `guests` çıkışı en yakın olandan başlayarak sıralanır; `guest` bu ilk
+ * misafirdir ve odanın plandaki rengini/etiketini belirler.
+ */
 function buildRoomView(db, now = new Date()) {
   const activeByRoom = new Map()
   for (const guest of db.guests) {
-    if (guest.status === 'active') activeByRoom.set(String(guest.roomNumber), guest)
+    if (guest.status !== 'active') continue
+    const key = String(guest.roomNumber)
+    const bucket = activeByRoom.get(key)
+    if (bucket) bucket.push(guest)
+    else activeByRoom.set(key, [guest])
   }
 
   return ALL_ROOMS.map((roomNumber) => {
-    const guest = activeByRoom.get(roomNumber) ?? null
+    const occupants = (activeByRoom.get(roomNumber) ?? [])
+      .map((guest) => toOccupantSummary(guest, now))
+      .sort((a, b) => new Date(a.checkOutDate) - new Date(b.checkOutDate))
+
     return {
       roomNumber,
       floor: floorOf(roomNumber),
       housekeeping: housekeepingOf(db, roomNumber),
       housekeepingUpdatedAt: db.housekeeping?.[roomNumber]?.updatedAt ?? null,
-      occupied: Boolean(guest),
-      guest: guest
-        ? {
-            id: guest.id,
-            fullName: guest.fullName,
-            phone: guest.phone,
-            checkInDate: guest.checkInDate,
-            checkOutDate: guest.checkOutDate,
-            paymentStatus: guest.paymentStatus,
-            remainingDays: getRemainingDays(guest.checkOutDate, now),
-            displayStatus: deriveDisplayStatus(guest, now),
-          }
-        : null,
+      occupied: occupants.length > 0,
+      occupantCount: occupants.length,
+      guests: occupants,
+      guest: occupants[0] ?? null,
     }
   })
 }

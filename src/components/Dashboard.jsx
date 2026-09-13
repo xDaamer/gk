@@ -48,9 +48,11 @@ export default function Dashboard({ refreshSignal }) {
           loading={!stats}
           value={stats ? `${stats.activeOccupancy}/${stats.totalRooms}` : null}
           caption={
-            stats?.dirtyRooms
-              ? `${stats.dirtyRooms} oda temizlik bekliyor`
-              : 'şu an konaklayan oda'
+            stats
+              ? `${stats.activeGuests} misafir${
+                  stats.dirtyRooms ? ` · ${stats.dirtyRooms} oda temizlik bekliyor` : ' konaklıyor'
+                }`
+              : 'şu an dolu oda'
           }
         />
         <StatCard

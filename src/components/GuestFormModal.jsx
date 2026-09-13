@@ -51,7 +51,8 @@ export default function GuestFormModal({ open, rooms = [], onClose, onCreated })
     [form.checkInDate, form.checkOutDate],
   )
 
-  // Oda listesi kata göre gruplanır; dolu odalar seçilemez, kirli odalar işaretlenir.
+  // Oda listesi kata göre gruplanır; daireler paylaşımlı olabildiği için dolu
+  // odalar da seçilebilir, mevcut kişi sayısı etikette gösterilir.
   const roomsByFloor = useMemo(
     () =>
       FLOORS.map((floor) => ({
@@ -196,10 +197,10 @@ export default function GuestFormModal({ open, rooms = [], onClose, onCreated })
                 {roomsByFloor.map((group) => (
                   <optgroup key={group.floor} label={floorLabel(group.floor)}>
                     {group.rooms.map((room) => (
-                      <option key={room.roomNumber} value={room.roomNumber} disabled={room.occupied}>
+                      <option key={room.roomNumber} value={room.roomNumber}>
                         {room.roomNumber}
                         {room.occupied
-                          ? ' — dolu'
+                          ? ` — dolu (${room.occupantCount} kişi)`
                           : room.housekeeping === 'dirty'
                             ? ' — boş (kirli)'
                             : ' — boş (temiz)'}
