@@ -16,6 +16,11 @@ import FloorPlan from './FloorPlan'
 const WHEEL_THRESHOLD = 26 // trackpad'in küçük adımlarını biriktir
 const WHEEL_LOCK_MS = 280 // iki kat değişimi arasındaki asgari süre
 
+const HOUSEKEEPING_OPTIONS = [
+  { value: 'clean', label: 'Temiz', Icon: Sparkles, color: 'var(--forest)' },
+  { value: 'dirty', label: 'Kirli', Icon: BrushCleaning, color: 'var(--soil)' },
+]
+
 const LEGEND = [
   { state: 'clean', label: 'Temiz · Boş' },
   { state: 'dirty', label: 'Kirli' },
@@ -130,25 +135,29 @@ function RoomDetail({ room, busy, onSetHousekeeping }) {
 
       <div className="mt-auto pt-5">
         <p className="mb-2 text-xs uppercase tracking-[0.14em] text-[var(--ink-muted)]">Temizlik</p>
+        {/* İki seçenek de her zaman tıklanabilir; seçili olan dolu renkle işaretlenir. */}
         <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            disabled={busy || !isDirty}
-            onClick={() => onSetHousekeeping(room.roomNumber, 'clean')}
-            className="inline-flex items-center justify-center gap-1.5 rounded-md border border-[var(--forest-line)] px-3 py-2 text-xs font-semibold text-[var(--forest-text)] transition hover:bg-[var(--forest-soft)] disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <Sparkles size={13} />
-            Temiz
-          </button>
-          <button
-            type="button"
-            disabled={busy || isDirty}
-            onClick={() => onSetHousekeeping(room.roomNumber, 'dirty')}
-            className="inline-flex items-center justify-center gap-1.5 rounded-md border border-[var(--soil-line)] px-3 py-2 text-xs font-semibold text-[var(--soil)] transition hover:bg-[var(--soil-soft)] disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <BrushCleaning size={13} />
-            Kirli
-          </button>
+          {HOUSEKEEPING_OPTIONS.map((option) => {
+            const active = option.value === (isDirty ? 'dirty' : 'clean')
+            return (
+              <button
+                key={option.value}
+                type="button"
+                aria-pressed={active}
+                disabled={busy}
+                onClick={() => onSetHousekeeping(room.roomNumber, option.value)}
+                className="inline-flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-xs font-semibold transition disabled:cursor-wait disabled:opacity-50"
+                style={
+                  active
+                    ? { background: option.color, borderColor: option.color, color: '#f6f1e4' }
+                    : { borderColor: 'var(--line)', color: 'var(--ink-muted)' }
+                }
+              >
+                <option.Icon size={13} />
+                {option.label}
+              </button>
+            )
+          })}
         </div>
         {room.housekeepingUpdatedAt && (
           <p className="mt-2 text-[11px] text-[var(--ink-muted)]">
