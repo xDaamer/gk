@@ -1,0 +1,24 @@
+{
+  "guests": [
+    {
+      "id": "431b98f8-9db4-4905-9021-8afde4e9786f",
+      "tcNo": "1",
+      "fullName": "kerem ünal",
+      "phone": "05303692317",
+      "roomNumber": "21",
+      "checkInDate": "2026-09-01T14:09:00.000Z",
+      "checkOutDate": "2026-09-01T14:09:00.000Z",
+      "pricingMode": "nightly",
+      "pricePerNight": 13,
+      "totalPrice": 13,
+      "paymentStatus": "pending",
+      "paidAmount": 0,
+      "notes": "",
+      "status": "checked_out",
+      "actualCheckOutDate": "2026-09-01T14:09:00.000Z",
+      "createdAt": "2026-09-01T14:09:25.425Z"
+    }
+  ],
+  "archive": [],
+  "housekeeping": {}
+}

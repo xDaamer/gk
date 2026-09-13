@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+/* ---- Marka paleti (sabit ton, header/plaket gibi bileşenler için) ---- */
+@theme {
+  --font-display: "Fraunces", "Iowan Old Style", ui-serif, serif;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-emerald-ink: #0e1b16;
+  --color-emerald-mid: #15291f;
+  --color-forest: #1c4a34;
+  --color-forest-deep: #123626;
+  --color-brass: #c6a15b;
+  --color-brass-deep: #8b6c2f;
+  --color-ivory: #f6f1e4;
+}
+
+/* ---- Semantik yüzeyler ----
+   Tek tema: her zaman beyaz zemin. Koyu yeşil, metin/buton/vurgu rengi olarak
+   ve yalnızca küçük yüzeylerde (dolu oda plakaları, rozetler) dolgu olarak
+   kullanılır — sayfanın genel arkaplanı her zaman beyaz kalır. */
+:root {
+  --surface-page: #ffffff;
+  --surface-header: #ffffff;
+  --surface-card: #ffffff;
+  --plaque-bg: rgba(20, 30, 24, 0.035);
+  --ink: #1c2620;
+  --ink-muted: #6b7268;
+  --line: rgba(20, 30, 24, 0.1);
+  --brass: #8b6c2f;
+  --brass-soft: rgba(139, 108, 47, 0.28);
+  --btn-primary-bg: #16281f;
+  --btn-primary-bg-hover: #21382b;
+  --btn-primary-text: #f6f1e4;
+
+  /* Koyu yeşil vurgu ailesi (temiz oda / dolu oda / kat planı) */
+  --forest: #1c4a34;
+  --forest-deep: #123626;
+  --forest-text: #1c4a34;
+  --forest-soft: rgba(28, 74, 52, 0.08);
+  --forest-line: rgba(28, 74, 52, 0.32);
+
+  /* Kirli oda (temizlik bekliyor) */
+  --soil: #a2620f;
+  --soil-soft: rgba(162, 98, 15, 0.12);
+  --soil-line: rgba(162, 98, 15, 0.38);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer components {
+  .input {
+    @apply w-full rounded-md border border-[var(--line)] bg-transparent px-3 py-2 text-sm text-[var(--ink)] outline-none transition placeholder:text-[var(--ink-muted)] focus:border-[var(--brass)] focus:ring-2 focus:ring-[var(--brass-soft)];
+  }
+}
+
+/* ---- Kat planı geçiş animasyonu (fare tekerleğiyle kat değişimi) ---- */
+@keyframes floor-enter-up {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes floor-enter-down {
+  from {
+    opacity: 0;
+    transform: translateY(-26px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.floor-enter-up {
+  animation: floor-enter-up 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.floor-enter-down {
+  animation: floor-enter-down 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floor-enter-up,
+  .floor-enter-down {
+    animation: none;
+  }
+}
